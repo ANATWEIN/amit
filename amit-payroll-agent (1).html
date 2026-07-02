@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>דמו סטטי · סוכן שכר לדוגמה</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --sblue:#123A66;
+    --orange:#EE7A1A;
+    --orange-deep:#C85F09;
+    --orange-soft:#FDEDDB;
+    --surface:#F5F7FA;
+    --card:#FFFFFF;
+    --line:#E3EAF1;
+    --text:#16324A;
+    --muted:#67798B;
+    --warn:#E3A81C;
+    --warn-soft:#FBF0D3;
+    --red:#D6543F;
+    --red-soft:#FBEAE7;
+    --sok:#1E5A96;
+    --sok-soft:#E9F0F8;
+    --shadow:0 1px 2px rgba(18,58,102,.05),0 8px 28px rgba(18,58,102,.08);
+    --shadow-lg:0 24px 60px rgba(18,58,102,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:'Assistant',system-ui,sans-serif;
+    background:var(--surface);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    font-variant-numeric:tabular-nums;
+    line-height:1.55;
+  }
+  .num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+
+  /* ---------- shell ---------- */
+  .app{display:flex;flex-direction:column;height:100vh;height:100dvh}
+  .topbar{
+    display:flex;align-items:center;gap:14px;
+    padding:14px 26px;background:var(--sblue);color:#fff;flex-shrink:0;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
+  .brand .mark{
+    width:30px;height:30px;border-radius:9px;
+    background:linear-gradient(135deg,var(--orange),var(--orange-deep));
+    display:grid;place-items:center;font-weight:800;color:#fff;font-size:16px;
+    box-shadow:0 2px 8px rgba(15,168,145,.5);
+  }
+  .topbar .cycle{
+    margin-inline-start:6px;padding-inline-start:16px;border-inline-start:1px solid rgba(255,255,255,.16);
+    display:flex;flex-direction:column;line-height:1.15;
+  }
+  .topbar .cycle b{font-weight:700;font-size:15px}
+  .topbar .cycle span{font-size:12px;color:#9DB4CC}
+  .topbar .who{margin-inline-start:auto;display:flex;align-items:center;gap:9px;font-size:13px;color:#C4D3E3}
+  .topbar .who .ava{width:30px;height:30px;border-radius:50%;background:#1B3A5C;display:grid;place-items:center;font-weight:700;color:#fff;font-size:13px}
+
+  .stage-wrap{flex:1;display:flex;min-height:0;overflow:hidden}
+
+  /* ---------- progress spine (right in RTL) ---------- */
+  .spine{
+    width:270px;flex-shrink:0;background:var(--card);border-inline-start:1px solid var(--line);
+    padding:26px 22px;overflow-y:auto;
+  }
+  .spine h4{font-size:12px;letter-spacing:.6px;color:var(--muted);font-weight:700;text-transform:uppercase;margin-bottom:18px}
+  .step{display:flex;gap:13px;position:relative;padding-bottom:22px;cursor:default}
+  .step:last-child{padding-bottom:0}
+  .step .rail{display:flex;flex-direction:column;align-items:center}
+  .step .dot{
+    width:26px;height:26px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
+    border:2px solid var(--line);background:var(--card);color:var(--muted);
+    font-size:12px;font-weight:700;transition:.35s;z-index:1;
+  }
+  .step .line{width:2px;flex:1;background:var(--line);margin:3px 0;transition:.35s}
+  .step:last-child .line{display:none}
+  .step .label{padding-top:2px}
+  .step .label b{display:block;font-size:14.5px;font-weight:600;color:var(--muted);transition:.3s}
+  .step .label small{font-size:12px;color:#95A6B6}
+  .step.done .dot{background:var(--orange);border-color:var(--orange);color:#fff}
+  .step.done .line{background:var(--orange)}
+  .step.done .label b{color:var(--text)}
+  .step.active .dot{border-color:var(--orange);color:var(--orange);box-shadow:0 0 0 5px var(--orange-soft)}
+  .step.active .label b{color:var(--sblue);font-weight:700}
+
+  /* ---------- focus area (left/center) ---------- */
+  .focus{flex:1;overflow-y:auto;padding:40px;display:flex;justify-content:center}
+  .focus-inner{width:100%;max-width:640px;padding-bottom:40px}
+
+  .agent-line{display:flex;gap:14px;align-items:flex-start;margin-bottom:22px}
+  .amit{
+    width:46px;height:46px;border-radius:14px;flex-shrink:0;
+    background:linear-gradient(145deg,var(--orange),var(--orange-deep));
+    display:grid;place-items:center;color:#fff;font-weight:800;font-size:18px;
+    box-shadow:0 6px 18px rgba(238,122,26,.4);position:relative;
+  }
+  .amit::after{content:"";position:absolute;bottom:-2px;left:-2px;width:13px;height:13px;border-radius:50%;background:var(--sok);border:2.5px solid var(--card)}
+  .agent-line .meta{padding-top:3px}
+  .agent-line .meta b{font-size:15px;font-weight:700;color:var(--sblue)}
+  .agent-line .meta span{display:block;font-size:12.5px;color:var(--muted)}
+
+  /* persistent agent presence (all stages) */
+  .agent-bar{
+    position:sticky;top:-2px;z-index:6;display:flex;align-items:center;gap:12px;
+    padding:11px 14px;margin:-4px 0 16px;border-radius:14px;
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+  }
+  .ab-ava{width:40px;height:40px;border-radius:12px;font-size:16px}
+  .ab-meta{line-height:1.2;min-width:0}
+  .ab-meta b{font-size:14px;font-weight:700;color:var(--sblue);display:block}
+  .ab-meta span{font-size:12.5px;color:var(--muted);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ab-live{margin-inline-start:auto;flex-shrink:0;display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--orange-deep);background:var(--orange-soft);padding:5px 11px;border-radius:20px}
+  .ab-live i{width:7px;height:7px;border-radius:50%;background:var(--orange);animation:apulse 1.6s ease-in-out infinite}
+  .agent-bar.thinking .ab-live i{animation-duration:.7s}
+  @keyframes apulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.7)}}
+  .ab-chat{margin-inline-start:auto;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;
+    background:var(--sblue);color:#fff;border:none;padding:9px 15px;border-radius:10px;transition:.15s;white-space:nowrap}
+  .ab-chat:hover{background:#0C2E52}
+  .ab-live{margin-inline-start:12px}
+
+  /* global chat panel */
+  .chat-scrim{position:fixed;inset:0;background:rgba(18,58,102,.35);opacity:0;pointer-events:none;transition:.25s;z-index:70}
+  .chat-scrim.open{opacity:1;pointer-events:auto}
+  .chat-panel{position:fixed;inset-block:0;inset-inline-start:0;width:400px;max-width:92vw;z-index:71;
+    background:var(--card);box-shadow:var(--shadow-lg);display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .chat-panel.open{transform:translateX(0)}
+  .chat-head{display:flex;align-items:center;gap:11px;padding:16px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+  .ch-meta{line-height:1.2;min-width:0}
+  .ch-meta b{font-size:14px;color:var(--sblue);display:block}
+  .ch-meta span{font-size:12px;color:var(--muted)}
+  .chat-head .x{margin-inline-start:auto;background:none;border:none;font-size:24px;color:var(--muted);cursor:pointer;line-height:1}
+  .chat-log{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px}
+  .cmsg{max-width:90%;padding:11px 14px;border-radius:14px;font-size:14px;line-height:1.5;animation:rise .3s ease}
+  .cmsg.q{align-self:flex-start;background:var(--sblue);color:#fff;border-start-start-radius:5px}
+  .cmsg.a{align-self:flex-end;background:var(--surface);color:var(--text);border:1px solid var(--line);border-start-end-radius:5px}
+  .csrc{display:inline-flex;align-items:center;gap:5px;margin-top:8px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px}
+  .csrc.att{background:var(--orange-soft);color:var(--orange-deep)}
+  .csrc.pay{background:var(--sok-soft);color:var(--sok)}
+  .csrc.both{background:#EDE7F6;color:#5B3F9A}
+  .chat-chips{display:flex;gap:7px;flex-wrap:wrap;padding:0 18px 10px}
+  .chat-chips .chip{font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;background:var(--surface);color:var(--sblue);border:1px solid var(--line);padding:7px 11px;border-radius:20px;transition:.15s}
+  .chat-chips .chip:hover{background:var(--orange-soft);border-color:#F4D9BC;color:var(--orange-deep)}
+  .chat-input{display:flex;gap:8px;padding:14px 18px;border-top:1px solid var(--line)}
+  .chat-input input{flex:1;font-family:inherit;font-size:14px;padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text)}
+  .chat-input input:focus{outline:none;border-color:var(--orange);background:#fff}
+  .chat-input button{font-family:inherit;font-size:18px;font-weight:700;background:var(--orange);color:#fff;border:none;border-radius:11px;padding:0 18px;cursor:pointer;transition:.15s}
+  .chat-input button:hover{background:var(--orange-deep)}
+  @media(max-width:860px){
+    .ab-chat{padding:8px 12px;font-size:12px}
+    .ab-chat .txt{display:none}
+    .chat-panel{inset-inline:0;inset-block:auto 0;top:auto;width:auto;max-width:none;max-height:86vh;
+      border-radius:20px 20px 0 0;transform:translateY(100%)}
+    .chat-panel.open{transform:translateY(0)!important}
+  }
+
+  .bubble{
+    background:var(--card);border:1px solid var(--line);border-radius:18px;
+    border-start-start-radius:5px;padding:22px 24px;box-shadow:var(--shadow);
+    animation:rise .5s cubic-bezier(.2,.8,.2,1);
+  }
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .bubble h2{font-size:21px;font-weight:700;color:var(--sblue);margin-bottom:8px;line-height:1.3}
+  .bubble p{font-size:15.5px;color:var(--text);margin-bottom:6px}
+  .bubble p.lead{font-size:16.5px}
+  .bubble .hl{color:var(--orange-deep);font-weight:700}
+
+  /* summary tiles */
+  .tiles{display:flex;gap:12px;flex-wrap:wrap;margin:18px 0 4px}
+  .tile{flex:1;min-width:120px;background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:14px 16px}
+  .tile .n{font-size:24px;font-weight:800;color:var(--sblue);line-height:1}
+  .tile .t{font-size:12.5px;color:var(--muted);margin-top:5px}
+  .tile.teal .n{color:var(--orange-deep)} .tile.teal{background:var(--orange-soft);border-color:#CDEDE7}
+  .tile.amber .n{color:var(--warn)} .tile.amber{background:var(--warn-soft);border-color:#F4E3C4}
+  .tile.red .n{color:var(--red)} .tile.red{background:var(--red-soft);border-color:#F3D6D0}
+
+  /* review list */
+  .rows{margin-top:16px;border:1px solid var(--line);border-radius:13px;overflow:hidden}
+  .row{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+  .row:last-child{border-bottom:none}
+  .row .ic{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:grid;place-items:center;font-size:15px}
+  .ic.amber{background:var(--warn-soft);color:var(--warn)}
+  .ic.red{background:var(--red-soft);color:var(--red)}
+  .ic.green{background:var(--sok-soft);color:var(--sok)}
+  .ic.teal{background:var(--orange-soft);color:var(--orange-deep)}
+  .row .body b{font-size:14.5px;font-weight:600;color:var(--sblue)}
+  .row .body p{font-size:13.5px;color:var(--muted);margin:2px 0 0}
+  .row .tag{margin-inline-start:auto;flex-shrink:0;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+  .tag.wait{background:var(--warn-soft);color:var(--warn)}
+  .tag.block{background:var(--red-soft);color:var(--red)}
+  .tag.ok{background:var(--sok-soft);color:var(--sok)}
+
+  .note{
+    display:flex;gap:11px;align-items:flex-start;margin-top:16px;padding:13px 15px;
+    background:var(--orange-soft);border:1px solid #F4D9BC;border-radius:12px;
+    font-size:13.5px;color:var(--orange-deep);
+  }
+  .note.guard{background:#FFF7EC;border-color:#F4E3C4;color:#9A6410}
+  .note.info{background:var(--green-soft);border-color:#CBDDF0;color:#1E5A96}
+  .note b{font-weight:700}
+
+  /* escalation ladder */
+  .ladder{margin-top:16px;border:1px solid var(--line);border-radius:13px;padding:16px 18px;background:var(--card)}
+  .ladder .lh{font-size:13.5px;font-weight:700;color:var(--sblue);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .lstep{display:flex;gap:12px;position:relative;padding-bottom:16px}
+  .lstep:last-child{padding-bottom:0}
+  .lstep .lr{display:flex;flex-direction:column;align-items:center}
+  .lstep .ld{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;font-size:11px;font-weight:700;border:2px solid var(--line);background:var(--card);color:var(--muted);transition:.4s}
+  .lstep .ll{width:2px;flex:1;background:var(--line);margin:3px 0;transition:.4s}
+  .lstep:last-child .ll{display:none}
+  .lstep .lb{padding-top:1px;font-size:13.5px;color:var(--text)}
+  .lstep .lb b{color:var(--sblue);font-weight:700}
+  .lstep .lb .day{font-size:11.5px;color:var(--muted);display:block;margin-bottom:1px}
+  .lstep.done .ld{background:var(--orange);border-color:var(--orange);color:#fff}
+  .lstep.done .ll{background:var(--orange)}
+  .lstep.future .ld{border-style:dashed}
+  .lstep.future .lb{color:var(--muted)}
+  .lstep.fired .ld{background:var(--red);border-color:var(--red);color:#fff}
+  .lstep.fired .ll{background:var(--red)}
+  .lstep.fired .lb b{color:var(--red)}
+  .lstep.fired .lb{color:var(--text)}
+
+  /* auto-run card */
+  .auto-card{margin-top:18px;background:var(--green-soft);border:1px solid #CBDDF0;border-radius:14px;padding:16px 18px}
+  .auto-h{display:flex;align-items:center;gap:9px;font-size:14.5px;font-weight:800;color:var(--sok);margin-bottom:6px}
+  .auto-dot{width:10px;height:10px;border-radius:50%;background:var(--orange);box-shadow:0 0 0 4px var(--orange-soft);animation:apulse 1.6s ease-in-out infinite}
+  .auto-card p{font-size:14px;color:var(--text);margin:0}
+  .auto-guard{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding-top:12px;border-top:1px dashed #CBDDF0;font-size:12.5px;color:var(--muted)}
+
+  /* gross vs net */
+  .gn{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .gn-h{font-size:14px;font-weight:700;color:var(--sblue);margin-bottom:14px}
+  .gn-row{display:grid;grid-template-columns:46px 1fr;align-items:center;gap:12px;margin-bottom:10px}
+  .gn-lbl{font-size:13px;font-weight:700;color:var(--text)}
+  .gn-bar{height:30px;background:#EAF0F5;border-radius:8px;overflow:hidden}
+  .gn-fill{height:100%;border-radius:8px;width:0;display:flex;align-items:center;justify-content:flex-start;padding-inline-start:12px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .gn-fill span{font-size:13px;font-weight:800;color:#fff;white-space:nowrap}
+  .gn-fill.gross{background:var(--sblue)}
+  .gn-fill.net{background:var(--orange)}
+  .gn-ded{margin-top:10px;font-size:12.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:12px}
+  .gn-ded b{color:var(--sblue);font-weight:800}
+
+  /* actions */
+  .actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+  .btn{
+    font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;border:none;
+    padding:14px 24px;border-radius:12px;transition:.18s;display:inline-flex;align-items:center;gap:9px;
+  }
+  .btn-primary{background:var(--orange);color:#fff;box-shadow:0 6px 16px rgba(15,168,145,.32)}
+  .btn-primary:hover{background:var(--orange-deep);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;color:var(--muted);padding:14px 12px}
+  .btn-ghost:hover{color:var(--sblue)}
+  .btn:focus-visible{outline:3px solid #9AD9CF;outline-offset:2px}
+
+  /* typing */
+  .typing{display:flex;gap:14px;align-items:center;margin-bottom:22px}
+  .dots{background:var(--card);border:1px solid var(--line);border-radius:16px;border-start-start-radius:5px;padding:16px 20px;display:flex;gap:5px;box-shadow:var(--shadow)}
+  .dots i{width:8px;height:8px;border-radius:50%;background:var(--orange);opacity:.4;animation:blink 1.2s infinite}
+  .dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+  @keyframes blink{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-3px)}}
+
+  /* executive KPIs */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 6px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 13px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .kpi::before{content:"";position:absolute;inset-block:0;inset-inline-end:0;width:4px;background:var(--orange)}
+  .kpi.ink::before{background:var(--sblue)} .kpi.amber::before{background:var(--warn)} .kpi.green::before{background:var(--sok)}
+  .kpi .val{font-size:19px;font-weight:800;color:var(--sblue);line-height:1.05;white-space:nowrap;letter-spacing:-.3px}
+  .kpi .cap{font-size:12px;color:var(--muted);margin-top:6px}
+  .kpi .delta{font-size:11.5px;font-weight:700;margin-top:8px;display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px}
+  .delta.up{background:var(--sok-soft);color:var(--sok)} .delta.flat{background:var(--surface);color:var(--muted)}
+
+  /* charts grid */
+  .exec-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:6px}
+  .card-chart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .card-chart.full{grid-column:1/-1}
+  .card-chart h5{font-size:14px;color:var(--sblue);font-weight:700;margin-bottom:2px}
+  .card-chart .sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+
+  /* donut */
+  .donut-flex{display:flex;align-items:center;gap:18px}
+  .donut{position:relative;width:150px;height:150px;flex-shrink:0}
+  .donut svg{transform:rotate(-90deg)}
+  .donut .seg{fill:none;stroke-width:22;stroke-dasharray:0 999;transition:stroke-dasharray 1.1s cubic-bezier(.3,.8,.3,1)}
+  .donut .center{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+  .donut .center b{font-size:20px;font-weight:800;color:var(--sblue);display:block;line-height:1}
+  .donut .center span{font-size:11px;color:var(--muted)}
+  .dlegend{display:flex;flex-direction:column;gap:9px;flex:1}
+  .dlegend .li{display:flex;align-items:center;gap:9px;font-size:13px}
+  .dlegend .li i{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+  .dlegend .li b{color:var(--sblue);font-weight:700;margin-inline-start:auto}
+  .dlegend .li span{color:var(--muted)}
+
+  /* line trend */
+  .line-svg{width:100%;height:170px;display:block;overflow:visible}
+  .line-svg .grid{stroke:var(--line);stroke-width:1}
+  .line-svg .area{fill:url(#areaGrad);opacity:0;transition:opacity .8s ease .6s}
+  .line-svg .trend{fill:none;stroke:var(--orange);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+    stroke-dasharray:1400;stroke-dashoffset:1400;transition:stroke-dashoffset 1.4s cubic-bezier(.3,.8,.3,1)}
+  .line-svg .pt{fill:#fff;stroke:var(--orange);stroke-width:3;opacity:0;transition:opacity .3s ease}
+  .line-svg .pt.last{fill:var(--orange)}
+  .line-svg .xlbl{fill:var(--muted);font-size:11px;font-family:'Assistant',sans-serif}
+  .line-svg .vlbl{fill:var(--sblue);font-size:10.5px;font-weight:700;font-family:'Assistant',sans-serif;opacity:0;transition:opacity .4s ease}
+
+  @media(max-width:860px){
+    .kpis{grid-template-columns:1fr 1fr}
+    .exec-grid{grid-template-columns:1fr}
+    .donut-flex{flex-direction:column;align-items:center;text-align:center}
+    .dlegend .li b{margin-inline-start:8px}
+  }
+
+  /* clickable affordance */
+  .clickable{cursor:pointer;position:relative}
+  .kpi.clickable,.card-chart.clickable{transition:transform .16s,box-shadow .16s,border-color .16s}
+  .kpi.clickable:hover,.card-chart.clickable:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg);border-color:#BFE7E0}
+  .drill{position:absolute;top:11px;inset-inline-start:12px;font-size:11px;font-weight:700;color:var(--orange-deep);opacity:.55;transition:opacity .16s}
+  .clickable:hover .drill{opacity:1}
+  .dlegend .li.clickable{padding:5px 7px;border-radius:9px;transition:background .14s}
+  .dlegend .li.clickable:hover{background:var(--surface)}
+  .donut .seg{cursor:pointer}
+
+  /* mini rows inside modals */
+  .mrow{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .mrow:last-child{border-bottom:none}
+  .mrow .mname{font-size:14px;color:var(--text);min-width:120px}
+  .mrow .mtrack{flex:1;height:9px;background:var(--surface);border-radius:6px;overflow:hidden}
+  .mrow .mfill{height:100%;border-radius:6px;background:var(--orange);width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+  .mrow .mval{font-size:14px;font-weight:700;color:var(--sblue);min-width:92px;text-align:end;font-variant-numeric:tabular-nums}
+  .mtot{display:flex;justify-content:space-between;margin-top:14px;padding-top:14px;border-top:2px solid var(--sblue);font-weight:800;color:var(--sblue);font-size:15px}
+  .mnote{margin-top:14px;font-size:13px;color:var(--muted);background:var(--surface);padding:12px 14px;border-radius:11px}
+  .mlink{margin-top:16px}
+
+  /* modal shell */
+  .modal-bg{position:fixed;inset:0;background:rgba(10,36,64,.5);backdrop-filter:blur(3px);display:none;z-index:60;align-items:center;justify-content:center;padding:20px}
+  .modal-bg.open{display:flex;animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}}
+  .modal{background:var(--card);border-radius:20px;max-width:540px;width:100%;max-height:86vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:pop .32s cubic-bezier(.2,.8,.2,1)}
+  @keyframes pop{from{opacity:0;transform:translateY(16px) scale(.97)}}
+  .modal-head{display:flex;align-items:center;gap:12px;padding:19px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);border-radius:20px 20px 0 0;z-index:1}
+  .modal-head .mi{width:36px;height:36px;border-radius:10px;flex-shrink:0;background:linear-gradient(145deg,var(--orange),var(--orange-deep));display:grid;place-items:center;color:#fff;font-weight:800;font-size:16px}
+  .modal-head b{font-size:16.5px;color:var(--sblue)}
+  .modal-head .x{margin-inline-start:auto;cursor:pointer;font-size:24px;color:var(--muted);background:none;border:none;line-height:.8;padding:2px 6px;border-radius:8px}
+  .modal-head .x:hover{background:var(--surface);color:var(--sblue)}
+  .modal-body{padding:20px 22px}
+  .modal-body h3{font-size:15px;color:var(--sblue);margin:18px 0 8px;font-weight:700}
+  .modal-body h3:first-child{margin-top:0}
+
+  /* waterfall */
+  .wf{display:flex;align-items:flex-end;gap:8px;height:210px;margin-top:6px}
+  .wf .col{flex:1;height:100%;position:relative}
+  .wf .wbar{position:absolute;inset-inline:0;margin-inline:auto;width:100%;max-width:60px;bottom:0;height:0;border-radius:6px 6px 0 0;
+    transition:height .7s cubic-bezier(.2,.8,.2,1),bottom .7s cubic-bezier(.2,.8,.2,1)}
+  .wf .wbar.base{background:#C6D4E1} .wf .wbar.add{background:var(--orange)} .wf .wbar.total{background:var(--sblue)}
+  .wf .wval{position:absolute;top:-4px;inset-inline:0;text-align:center;font-size:10.5px;font-weight:700;color:var(--sblue);white-space:nowrap;transform:translateY(-100%)}
+  .wf-x{display:flex;gap:8px;margin-top:8px}
+  .wf-x .xl{flex:1;text-align:center;font-size:11.5px;color:var(--muted);line-height:1.25}
+  .wf-connect{font-size:12px;color:var(--orange-deep);text-align:center;margin-top:12px;font-weight:600}
+
+  /* heatmap */
+  .hm{display:grid;gap:5px;margin-top:6px}
+  .hm .hcell{border-radius:8px;display:grid;place-items:center;font-size:14px;font-weight:700;aspect-ratio:1.9/1;transition:transform .12s}
+  .hm .hhead{font-size:11.5px;font-weight:600;color:var(--muted);display:grid;place-items:center;text-align:center;aspect-ratio:auto;padding:4px 0}
+  .hm .hdept{font-size:13px;font-weight:600;color:var(--sblue);display:flex;align-items:center;justify-content:flex-start;padding-inline-start:4px}
+  .hm .hcell.data{cursor:pointer}
+  .hm .hcell.data:hover{transform:scale(1.06);box-shadow:var(--shadow)}
+  .hm-legend{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:11.5px;color:var(--muted)}
+  .hm-legend .sw{width:16px;height:12px;border-radius:3px}
+
+  @media(max-width:860px){
+    .modal-bg{align-items:flex-end;padding:0}
+    .modal{max-width:100%;max-height:92vh;border-radius:20px 20px 0 0;animation:slideup .3s cubic-bezier(.2,.8,.2,1)}
+    @keyframes slideup{from{transform:translateY(100%)}}
+    .modal-head{border-radius:20px 20px 0 0}
+    .mrow .mname{min-width:90px;font-size:13px}
+    .mrow .mval{min-width:80px;font-size:13px}
+    .drill{font-size:10px}
+  }
+
+  /* report chart */
+  .chart{margin-top:18px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .chart h5{font-size:14px;color:var(--sblue);font-weight:700;margin-bottom:2px}
+  .chart .sub{font-size:12.5px;color:var(--muted);margin-bottom:16px}
+  .bars{display:flex;flex-direction:column;gap:14px}
+  .barrow{display:grid;grid-template-columns:80px 1fr;align-items:center;gap:12px}
+  .barrow .name{font-size:13.5px;color:var(--text);font-weight:600}
+  .barpair{display:flex;flex-direction:column;gap:5px}
+  .bar{height:15px;border-radius:6px;position:relative;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .bar.jul{background:var(--orange)}
+  .bar.jun{background:#C6D4E1}
+  .bar span{position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);font-size:10.5px;font-weight:700;color:#fff}
+  .bar.jun span{color:var(--muted)}
+  .legend{display:flex;gap:16px;margin-top:14px;font-size:12px;color:var(--muted)}
+  .legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-inline-end:6px;vertical-align:-1px}
+
+  /* reports center */
+  .rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+  .rep-card{display:flex;align-items:center;gap:12px;text-align:start;cursor:pointer;
+    background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 15px;
+    font-family:inherit;transition:.15s;width:100%}
+  .rep-card:hover{border-color:var(--orange);box-shadow:var(--shadow);transform:translateY(-1px)}
+  .rep-card .ri{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;font-size:16px;background:var(--orange-soft);color:var(--orange-deep)}
+  .rep-card .ri.blue{background:var(--sok-soft);color:var(--sok)}
+  .rep-card .rt{min-width:0}
+  .rep-card .rt b{display:block;font-size:14px;font-weight:700;color:var(--sblue)}
+  .rep-card .rt span{font-size:12px;color:var(--muted)}
+  .rep-card .rarrow{margin-inline-start:auto;color:var(--muted);font-size:16px;flex-shrink:0}
+  .mtbl{width:100%;border-collapse:collapse;margin-top:4px}
+  .mtbl th,.mtbl td{padding:9px 6px;font-size:13px;text-align:start;border-bottom:1px solid var(--line)}
+  .mtbl th{color:var(--muted);font-weight:600;font-size:12px}
+  .mtbl td{color:var(--text)}
+  .mtbl td.v{font-weight:700;color:var(--sblue);text-align:end;font-variant-numeric:tabular-nums}
+  .mtbl td.up{color:var(--sok);font-weight:700;text-align:end}
+  .mtbl tr:last-child td{border-bottom:none}
+  .mtbl tr.tot td{border-top:2px solid var(--line);font-weight:800;color:var(--sblue)}
+  @media(max-width:860px){ .rep-grid{grid-template-columns:1fr} }
+
+  /* report Q&A */
+  .qa{margin-top:18px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+  .qa-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .qa-head .mini{width:32px;height:32px;border-radius:10px;background:linear-gradient(145deg,var(--orange),var(--orange-deep));display:grid;place-items:center;color:#fff;font-weight:800;font-size:14px}
+  .qa-head b{font-size:14.5px;color:var(--sblue)}
+  .qa-log{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+  .q,.a{padding:11px 15px;border-radius:13px;font-size:14px;max-width:88%;animation:rise .35s ease}
+  .q{background:var(--orange);color:#fff;align-self:flex-start;border-start-start-radius:5px}
+  .a{background:var(--surface);color:var(--text);align-self:flex-end;border-start-end-radius:5px;border:1px solid var(--line)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .chip{font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;background:var(--orange-soft);color:var(--orange-deep);border:1px solid #CDEDE7;padding:7px 13px;border-radius:20px;transition:.15s}
+  .chip:hover{background:#D3EFEA}
+  .qa-input{display:flex;gap:9px}
+  .qa-input input{flex:1;font-family:inherit;font-size:14px;padding:12px 15px;border:1px solid var(--line);border-radius:11px;background:var(--surface);color:var(--text)}
+  .qa-input input:focus{outline:none;border-color:var(--orange);background:#fff}
+  .qa-input button{font-family:inherit;font-weight:700;background:var(--sblue);color:#fff;border:none;border-radius:11px;padding:0 18px;cursor:pointer}
+
+  .done-badge{display:inline-flex;align-items:center;gap:8px;background:var(--sok-soft);color:var(--sok);font-weight:700;font-size:13px;padding:7px 14px;border-radius:20px;margin-bottom:14px}
+
+  /* mobile */
+  .m-progress{display:none}
+  @media(max-width:860px){
+    .spine{display:none}
+    .focus{padding:20px 16px}
+    .topbar{padding:12px 16px;gap:10px}
+    .topbar .cycle{padding-inline-start:12px;margin-inline-start:2px}
+    .topbar .who span{display:none}
+    .m-progress{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0}
+    .m-progress .track{flex:1;height:7px;background:var(--line);border-radius:10px;overflow:hidden}
+    .m-progress .fill{height:100%;background:var(--orange);border-radius:10px;transition:width .5s ease}
+    .m-progress .lbl{font-size:12.5px;font-weight:700;color:var(--sblue);white-space:nowrap}
+    .m-progress .cnt{font-size:12px;color:var(--muted);white-space:nowrap}
+    .bubble{padding:18px 18px;border-radius:16px}
+    .bubble h2{font-size:19px}
+    .actions{flex-direction:column-reverse;align-items:stretch}
+    .btn{justify-content:center;padding:15px 20px}
+    .btn-ghost{padding:12px}
+    .tile{min-width:calc(50% - 6px)}
+    .a,.q{max-width:100%}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div style="background:#fff3cd;color:#664d03;padding:12px 20px;text-align:center;font-weight:700;border-bottom:1px solid #ffe69c;font-size:13.5px;flex-shrink:0;line-height:1.4">דמו סטטי בלבד לצורכי המחשה. אין כאן מערכת אמיתית, אין התחברות, אין איסוף מידע, אין שליחת נתונים ואין ביצוע פעולות כספיות.</div>
+  <div class="topbar">
+    <div class="brand"><span class="mark">D</span> Demo Payroll</div>
+    <div class="cycle"><b>מחזור שכר · יולי 2026 (דמו)</b><span>דמו סטטי · לדוגמה</span></div>
+    <div class="who"><span>משתמש דמו</span><span class="ava">D</span></div>
+  </div>
+
+  <div class="m-progress">
+    <span class="lbl" id="mLbl">פתיחת מחזור</span>
+    <div class="track"><div class="fill" id="mFill" style="width:0%"></div></div>
+    <span class="cnt" id="mCnt">1/7</span>
+  </div>
+
+  <div class="stage-wrap">
+    <div class="focus"><div class="focus-inner">
+      <div class="agent-bar" id="agentBar">
+        <div class="amit ab-ava">ע</div>
+        <div class="ab-meta"><b>עמית · סוכן השכר</b><span id="agentStatus">מלווה את מחזור יולי</span></div>
+        <button class="ab-chat" onclick="openChat()">💬 שוחח עם עמית</button>
+        <div class="ab-live"><i></i>פעיל</div>
+      </div>
+      <div id="focus"></div>
+    </div></div>
+    <aside class="spine">
+      <h4>מחזור השכר</h4>
+      <div id="spine"></div>
+    </aside>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head"><span class="mi" id="modalIcon">₪</span><b id="modalTitle"></b>
+      <button class="x" onclick="closeModal()" aria-label="סגור">×</button></div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- global agent chat — available on every stage -->
+<div class="chat-scrim" id="chatScrim" onclick="closeChat()"></div>
+<div class="chat-panel" id="chatPanel" role="dialog" aria-label="שיחה עם עמית">
+  <div class="chat-head">
+    <div class="amit ab-ava">ע</div>
+    <div class="ch-meta"><b>עמית · סוכן השכר</b><span>שכבה אחת מעל נוכחות ושכר</span></div>
+    <button class="x" onclick="closeChat()" aria-label="סגור">×</button>
+  </div>
+  <div class="chat-log" id="chatLog"></div>
+  <div class="chat-chips" id="chatChips"></div>
+  <div class="chat-input">
+    <input id="chatInput" placeholder="שאל אותי כל דבר — נוכחות או שכר…" onkeydown="if(event.key==='Enter')chatSend()">
+    <button onclick="chatSend()" aria-label="שלח">↩</button>
+  </div>
+</div>
+
+<script>
+/* ---------- fixed demo data (single source of truth → no invented answers) ---------- */
+const DATA = {
+  headcountJul:342, headcountJun:340, newHires:3, leaving:1,
+  attTotal:16, attAuto:10, attReview:6,
+  grossJul:4182600, grossJun:3946200,
+  otJul:1240, otJun:980,
+  salaryChanges:4, salaryPreApproved:3, salaryAmitInitiated:1,
+  payslipsSent:341, freelancers:1,
+  // payroll preview — deductions sum to 1,336,600 ; net = grossJul - that = 2,846,000
+  payrollPreview:[
+    {name:'מס הכנסה', v:688200},
+    {name:'ביטוח לאומי ובריאות (עובד)', v:397400},
+    {name:'פנסיה (חלק עובד)', v:251000},
+  ],
+  depts:[
+    {name:'מכירות', jul:1120000, jun:1010000},
+    {name:'פיתוח',  jul:1560000, jun:1520000},
+    {name:'תפעול',  jul:890000,  jun:860000},
+    {name:'הנהלה',  jul:612600,  jun:556200},
+  ],
+  // "why did payroll go up" breakdown — sums to grossJul-grossJun = 236,400
+  driver:[
+    {t:'3 עובדים חדשים', v:95000},
+    {t:'בונוסים רבעוניים', v:98400},
+    {t:'260 שעות נוספות מעל יוני', v:43000},
+  ],
+  // gross components — sum to grossJul (4,182,600)
+  components:[
+    {name:'שכר בסיס',        v:3310000, c:'#F0801A'},
+    {name:'בונוסים ועמלות',  v:604000,  c:'#2680D6'},
+    {name:'שעות נוספות',     v:268600,  c:'#17A2C4'},
+  ],
+  employerExtras:941100,          // employer social contributions
+  // employerCost = grossJul + employerExtras = 5,123,700 ; avg computed in code
+  trend:[                          // 6-month gross; jun & jul match grossJun/grossJul
+    {m:'פבר', v:3780000},
+    {m:'מרץ', v:3910000},
+    {m:'אפר', v:3845000},
+    {m:'מאי', v:3902000},
+    {m:'יוני', v:3946200},
+    {m:'יולי', v:4182600},
+  ],
+  // employer contributions — sum to employerExtras (941,100)
+  employerBreakdown:[
+    {name:'פנסיה והשתלמות (מעסיק)', v:460000},
+    {name:'פיצויים', v:348400},
+    {name:'ביטוח לאומי (מעסיק)', v:132700},
+  ],
+  // overtime hours by department — sum to otJul (1,240)
+  otByDept:[
+    {name:'תפעול', v:520},
+    {name:'מכירות', v:430},
+    {name:'פיתוח', v:220},
+    {name:'הנהלה', v:70},
+  ],
+  // headcount composition (active roster = 342)
+  headcountBreakdown:[
+    {name:'עובדים ותיקים', v:339},
+    {name:'עובדים חדשים החודש', v:3},
+  ],
+  // attendance + document anomalies matrix — rows & columns both sum to attTotal (16)
+  anomalyTypes:['החתמות','היעדרות','ש.נוספות','% משרה','חופשה','מסמכים'],
+  heatmap:[
+    {dept:'מכירות', row:[2,1,1,0,1,1]}, // 6
+    {dept:'פיתוח',  row:[1,1,1,1,0,1]}, // 5
+    {dept:'תפעול',  row:[2,0,1,0,1,0]}, // 4
+    {dept:'הנהלה',  row:[1,0,0,0,0,0]}, // 1
+  ],
+  // the anomalies that need the accountant's eyes (attReview = 7)
+  reviewAnomalies:[
+    {emp:'עובד 002', title:'3 ימי היעדרות לא מדווחים', detail:'15–17/07 · אין דיווח מחלה/חופשה',                        icon:'!', sev:'red',   tag:'חסר דיווח',  tagType:'block', key:'yossi'},
+    {emp:'עובד 003',  title:'חריגת שעות נוספות',        detail:'42 שעות · מעל התקרה החודשית (40)',                       icon:'↑', sev:'red',   tag:'חריגה',     tagType:'block'},
+    {emp:'עובד 004', title:'שעות נוספות ללא אישור מראש', detail:'12 שעות נוספות בשבת ללא אישור מנהל מוקדם',            icon:'↑', sev:'amber', tag:'לאישור',    tagType:'wait'},
+    {emp:'עובד 005',  title:'חסר טופס 101 לשנת 2026',    detail:'אין 101 בתוקף — ברירת מחדל: ניכוי מס מקסימלי. נשלחה בקשה למילוי דיגיטלי', icon:'§', sev:'red', tag:'חסר 101', tagType:'block'},
+    {emp:'עובד 006',  title:'מעבר 100%→80% משרה',        detail:'אמצע חודש · דורש אישור עדכון',                            icon:'%', sev:'amber', tag:'לאישור',    tagType:'wait'},
+    {emp:'עובד 007',  title:'חסר פרטי חשבון בנק',        detail:'עובד חדש — אין פרטי בנק להעברת שכר',                      icon:'₪', sev:'amber', tag:'חסר בנק',   tagType:'wait'},
+  ],
+  // sick & reserve duty — captured in attendance, drive the payroll calculation
+  absences:{
+    sick:{emps:4, days:9, pendingCert:1},                 // 1 יום ממתין לתעודה רפואית
+    reserve:{emps:2, days:6, claim:'תביעת החזר לביטוח לאומי בהכנה'},
+  },
+};
+const ils = n => '₪' + n.toLocaleString('he-IL');
+const pct = (a,b) => ((a-b)/b*100).toFixed(1);
+// vibrant categorical palette — used in charts/reports (UI chrome stays branded orange+blue)
+const CHART = ['#F0801A','#2680D6','#17A2C4','#8B5CF6','#EE6C8A','#F5B301'];
+
+/* ---------- stage definitions ---------- */
+const STAGES = [
+  {key:'open', label:'פתיחת מחזור', sub:'26 לחודש · סנכרון'},
+  {key:'att',  label:'בדיקות נוכחות', sub:'חריגות והיעדרויות'},
+  {key:'gate', label:'העברה לשכר', sub:'בדיקת תאימות מצבת'},
+  {key:'pay',  label:'חריגות שכר', sub:'בונוסים · שינויי שכר'},
+  {key:'run',  label:'הרצת שכר', sub:'חישוב סופי'},
+  {key:'post', label:'אחרי ההרצה', sub:'העברות · תלושים'},
+  {key:'exec', label:'סיכום מנהלים', sub:'KPI · גרפים · מגמות'},
+  {key:'rep',  label:'דוחות', sub:'השוואות · שאלות'},
+];
+let current = 0;
+
+/* ---------- spine + mobile progress ---------- */
+function renderSpine(){
+  const s = document.getElementById('spine');
+  s.innerHTML = STAGES.map((st,i)=>{
+    const cls = i<current?'done':(i===current?'active':'');
+    const inner = i<current ? '✓' : (i+1);
+    return `<div class="step ${cls}">
+      <div class="rail"><div class="dot">${inner}</div><div class="line"></div></div>
+      <div class="label"><b>${st.label}</b><small>${st.sub}</small></div>
+    </div>`;
+  }).join('');
+  document.getElementById('mLbl').textContent = STAGES[current].label;
+  document.getElementById('mCnt').textContent = (current+1)+'/'+STAGES.length;
+  document.getElementById('mFill').style.width = ((current)/(STAGES.length-1)*100)+'%';
+}
+
+/* ---------- agent bubble helpers ---------- */
+function updateAgentBar(sub, thinking){
+  const s = document.getElementById('agentStatus'); if(s) s.textContent = sub;
+  const bar = document.getElementById('agentBar'); if(bar) bar.classList.toggle('thinking', !!thinking);
+}
+function agentHeader(sub){
+  updateAgentBar(sub, false);
+  return '';
+}
+function showTyping(then){
+  const f = document.getElementById('focus');
+  updateAgentBar('עובד על זה…', true);
+  f.innerHTML = `<div class="typing"><div class="dots"><i></i><i></i><i></i></div></div>`;
+  const reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  setTimeout(then, reduce?60:850);
+}
+
+function go(i){ current=i; renderSpine(); showTyping(()=>renderStage()); }
+function next(){ if(current<STAGES.length-1) go(current+1); }
+
+/* ---------- stage renderers ---------- */
+function renderStage(){
+  const f = document.getElementById('focus');
+  const k = STAGES[current].key;
+  let html = '';
+
+  if(k==='open'){
+    html = agentHeader('פתחתי את המחזור אוטומטית ב‑26 לחודש') + `<div class="bubble">
+      <h2>בוקר טוב. פתחתי את מחזור השכר של יולי.</h2>
+      <p class="lead">סנכרנתי את האוכלוסייה דרך <span class="hl">המערכת המרכזית</span> ואני מוכן להתחיל. הנה מה שהשתנה מאז יוני:</p>
+      <div class="tiles">
+        <div class="tile teal"><div class="n num">${DATA.headcountJul}</div><div class="t">עובדים במצבת</div></div>
+        <div class="tile"><div class="n num">${DATA.newHires}</div><div class="t">עובדים חדשים</div></div>
+        <div class="tile"><div class="n num">${DATA.leaving}</div><div class="t">עוזב (גמר חשבון)</div></div>
+      </div>
+      <div class="note">✦ <div>אני אוביל אותך שלב‑אחר‑שלב. בכל צומת אפשר לתת לי לטפל, או להיכנס ולבדוק בעצמך. <b>שום דבר לא רץ בלי שתדעי.</b></div></div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">בוא נתחיל בבדיקות הנוכחות ←</button>
+      </div></div>`;
+  }
+
+  else if(k==='att'){
+    const revRows = DATA.reviewAnomalies.map(a=>{
+      const y = a.key==='yossi';
+      return `<div class="row"${y?' id="rowYossi"':''}><div class="ic ${a.sev}"${y?' id="icYossi"':''}>${a.icon}</div>`
+        + `<div class="body"><b>${a.emp} · ${a.title}</b><p${y?' id="pYossi"':''}>${a.detail}</p></div>`
+        + `<span class="tag ${a.tagType}"${y?' id="tagYossi"':''}>${a.tag}</span></div>`;
+    }).join('');
+    html = agentHeader('סרקתי נוכחות של '+DATA.headcountJul+' עובדים') + `<div class="bubble">
+      <h2>עברתי על הנוכחות. מצאתי ${DATA.attTotal} חריגות.</h2>
+      <p><span class="hl">${DATA.attAuto} מהן אני סוגר לבד</span> — החתמות חסרות עם היסטוריה חד‑משמעית, המרות אחוז משרה מתועדות, והיעדרויות שכבר אושרו במערכת. ${DATA.attReview} דורשות את העיניים שלך:</p>
+      <div class="rows">${revRows}</div>
+
+      <div class="note info">✓ <div>דוגמה למה שסגרתי לבד: החתמת יציאה חסרה של <b>עובד 001</b> — השלמתי אוטומטית לפי המשמרת המתוכננת שלה (יציאה 17:00) וסימנתי לביקורת. לא צריך היה להעסיק אותך בזה.</div></div>
+
+      <div class="ladder">
+        <div class="lh">↳ הטיפול שלי בדיווח החסר של יוסי — כדי שהמחזור לא ייתקע בגללו</div>
+        <div class="lstep done"><div class="lr"><div class="ld">✓</div><div class="ll"></div></div>
+          <div class="lb"><span class="day">15/07 · יום גילוי</span>סימנתי <b>"ממתין להשלמת דיווח"</b> ושלחתי ליוסי תזכורת במייל ובאפליקציה.</div></div>
+        <div class="lstep done"><div class="lr"><div class="ld">✓</div><div class="ll"></div></div>
+          <div class="lb"><span class="day">16/07 · אין תגובה</span>הסלמתי למנהל הישיר עם בקשת אישור או תיקון.</div></div>
+        <div class="lstep future" id="yStep3"><div class="lr"><div class="ld" id="yDot">3</div><div class="ll"></div></div>
+          <div class="lb" id="yStep3Body"><span class="day">25/07 · מועד סגירת הנוכחות</span>אם עדיין אין תגובה — אכניס אוטומטית <b>היעדרות לא מאושרת (ללא תשלום)</b>, כדי לאפשר סגירת מחזור בזמן. מסומן לך, והפיך בתיקון רטרו בחודש הבא אם הדיווח יגיע.</div></div>
+      </div>
+
+      <div class="note" id="attNote">✦ <div>העיקרון: עובד בודד שלא מגיב <b>לא עוצר את השכר של כולם</b>. יש deadline, אסקלציה, ואז ברירת מחדל מבוקרת והפיכה. רוצה לראות מה קורה אם המועד מגיע בלי תגובה?</div></div>
+
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">טפל ב‑${DATA.attAuto}, ואישרתי את ה‑${DATA.attReview} ←</button>
+        <button class="btn btn-ghost" id="btnEscalate" onclick="escalateYossi()">דמה: חלף מועד הסגירה, אין תגובה ↓</button>
+      </div></div>`;
+  }
+
+  else if(k==='gate'){
+    html = agentHeader('בדיקת תאימות לפני העברה לשכר') + `<div class="bubble">
+      <h2>הנוכחות סגורה. בודק תאימות מצבת לפני שאני מעביר לשכר.</h2>
+      <p>לפני שאני שולח את תמונת הנוכחות למנוע השכר, אני מוודא ששתי המערכות מדברות על אותה אוכלוסייה — כדי שלא ייווצרו עובדים "יתומים" בשכר.</p>
+      <div class="rows">
+        <div class="row"><div class="ic green">✓</div><div class="body"><b>${DATA.headcountJul} עובדים תואמים בין נוכחות לשכר</b><p>כולל 3 החדשים שנוספו החודש</p></div><span class="tag ok">תקין</span></div>
+        <div class="row"><div class="ic teal">₪</div><div class="body"><b>1 פרילנסר סומן בנפרד</b><p>ספק 001 · חשבונית, לא תלוש — לא נכנס לחישוב שכר</p></div><span class="tag ok">מסומן</span></div>
+        <div class="row"><div class="ic green">✓</div><div class="body"><b>גמר חשבון לעוזב שויך</b><p>ימי הבראה, פדיון חופשה ופיצויים מחושבים</p></div><span class="tag ok">מוכן</span></div>
+      </div>
+      <div class="note">✦ <div>הסימון של הפרילנסר ב<b>נקודת המעבר</b> בין הנוכחות לשכר הוא בדיוק המקום שבו מערכות אחרות מפילות אותו. אצלי הוא לא מקבל תלוש בטעות.</div></div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">העבר את הקובץ לשכר ←</button>
+      </div></div>`;
+  }
+
+  else if(k==='pay'){
+    html = agentHeader('חריגות שכר · בונוסים · שינויי שכר') + `<div class="bubble">
+      <h2>הקובץ בשכר. חישבתי בונוסים, עמלות וגמר חשבון.</h2>
+      <p>כל התוספות המשתנות חושבו. יש <span class="hl">${DATA.salaryChanges} שינויי שכר</span> שדורשים אישור — וכאן חשוב שתראי הפרדה:</p>
+      <div class="rows">
+        <div class="row"><div class="ic green">✓</div><div class="body"><b>עובד 008 · העלאת שכר ₪1,500</b><p>אושר מראש על ידך · 01/07</p></div><span class="tag ok">מאושר</span></div>
+        <div class="row"><div class="ic green">✓</div><div class="body"><b>עובד 009 · עדכון החזר נסיעות</b><p>אושר מראש על ידך</p></div><span class="tag ok">מאושר</span></div>
+        <div class="row"><div class="ic green">✓</div><div class="body"><b>עובד 010 · שינוי דירוג</b><p>אושר מראש על ידך</p></div><span class="tag ok">מאושר</span></div>
+        <div class="row"><div class="ic amber">⚖</div><div class="body"><b>תיקון קיזוז מקדמה · ₪2,300</b><p>טעות שאני זיהיתי וייזמתי את תיקונה</p></div><span class="tag wait" id="tagCorrection">ממתין לאישור נפרד</span></div>
+      </div>
+      <div class="note guard">⚖ <div><b>הפרדת סמכויות:</b> את השינוי הרביעי אני יזמתי — לכן אני <b>לא מאשר אותו בעצמי</b>. הוא ממתין לאישור חשב נוסף. ככה אין מצב שהסוכן גם מזהה, גם מתקן וגם מאשר את אותו שינוי כספי.</div></div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">אשר את ה‑3 והמשך להרצה ←</button>
+        <button class="btn btn-ghost" id="btnSendApproval" onclick="sendForApproval()">שלח את הרביעי לאישור נוסף</button>
+      </div></div>`;
+  }
+
+  else if(k==='run'){
+    const ded = DATA.payrollPreview.reduce((s,d)=>s+d.v,0);
+    const net = DATA.grossJul - ded;
+    const netPct = (net/DATA.grossJul*100).toFixed(0);
+    const dedPct = (ded/DATA.grossJul*100).toFixed(0);
+    html = agentHeader('הרצת שכר · חישוב סופי') + `<div class="bubble">
+      <h2>הכל מוכן להרצה.</h2>
+      <p>מס הכנסה, ביטוח לאומי, קופות ומסלקה חושבו לכל ${DATA.payslipsSent} העובדים. הנה התמונה לפני שאני מריץ:</p>
+      <div class="tiles">
+        <div class="tile teal"><div class="n num">${ils(DATA.grossJul)}</div><div class="t">סך שכר ברוטו</div></div>
+        <div class="tile"><div class="n num">+${pct(DATA.grossJul,DATA.grossJun)}%</div><div class="t">מול יוני</div></div>
+        <div class="tile"><div class="n num">${DATA.payslipsSent}</div><div class="t">תלושים לחישוב</div></div>
+      </div>
+      <div class="gn">
+        <div class="gn-h">ברוטו מול נטו</div>
+        <div class="gn-row"><span class="gn-lbl">ברוטו</span><div class="gn-bar"><div class="gn-fill gross" data-w="100%"><span>${ils(DATA.grossJul)}</span></div></div></div>
+        <div class="gn-row"><span class="gn-lbl">נטו</span><div class="gn-bar"><div class="gn-fill net" data-w="${netPct}%"><span>${ils(net)} · ${netPct}%</span></div></div></div>
+        <div class="gn-ded">ניכויי חובה מהעובד: <b>${ils(ded)}</b> (${dedPct}%) — מס הכנסה, ביטוח לאומי ובריאות, פנסיה. זהו הסכום שיועבר בפועל לחשבונות העובדים.</div>
+      </div>
+      <div class="note">✦ <div>זיהיתי שהעלייה מול יוני (<b>${ils(DATA.grossJul-DATA.grossJun)}</b>) מוסברת במלואה — 3 עובדים חדשים, בונוסים רבעוניים ושעות נוספות. אין חריגה בלתי‑מוסברת. אפשר להריץ בביטחון.</div></div>
+      <div class="auto-card">
+        <div class="auto-h"><span class="auto-dot"></span> הכל ירוק — מתוזמן להרצה אוטומטית</div>
+        <p>כל החריגות טופלו וכל האישורים ניתנו. אני מתוכנן <b>להריץ אוטומטית ב‑28/07 בשעה 09:00</b> — את לא צריכה לגעת. אם תרצי, אפשר גם להריץ עכשיו.</p>
+        <div class="auto-guard">⛉ <span>הguardrail: אילו נשארה חריגה פתוחה או אישור חסר — הייתי עוצר את ההרצה האוטומטית ומבקש את אישורך.</span></div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">הדגם הרצה ←</button>
+        <button class="btn btn-ghost" onclick="next()">הדגם הרצה אוטומטית</button>
+        <button class="btn btn-ghost" onclick="previewPayroll()">פירוט הניכויים</button>
+      </div></div>`;
+  }
+
+  else if(k==='post'){
+    html = agentHeader('אחרי ההרצה · העברות ותלושים') + `<div class="bubble">
+      <div class="done-badge">✓ השכר רץ בהצלחה</div>
+      <h2>סיימתי את ההרצה — וכבר טיפלתי בהמשך אוטומטית.</h2>
+      <div class="rows">
+        <div class="row"><div class="ic green">✓</div><div class="body"><b>הדגמת שליחת ${DATA.payslipsSent} תלושים</b><p>לאזור האישי ולמייל של כל עובד</p></div><span class="tag ok">הודגם</span></div>
+        <div class="row"><div class="ic amber" id="icTransfer">◷</div><div class="body"><b>הדגמת קובץ העברות בנקאיות</b><p id="pTransfer">${ils(DATA.grossJul)} · ${DATA.payslipsSent} עובדים · יוצא ב‑28/07 09:00</p></div><span class="tag wait" id="tagTransfer">חלון ביטול 2 שעות</span></div>
+        <div class="row"><div class="ic teal">₪</div><div class="body"><b>ספק 001 · פרילנסר</b><p>אישור תשלום מול חשבונית — <b>ללא תלוש</b></p></div><span class="tag ok">טופל בנפרד</span></div>
+      </div>
+      <div class="note info">↩ <div><b>guardrail:</b> את התלושים שלחתי אוטומטית (הפיך — אפשר לשלוח מתוקן). את העברת <b>הכספים</b> — שהיא בלתי‑הפיכה — אני משאיר עם חלון ביטול של שעתיים לפני שהיא יוצאת בפועל, כדי שתהיה לך נקודת עצירה אחרונה.</div></div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">המשך לסיכום המנהלים ←</button>
+        <button class="btn btn-ghost" id="btnCancelTransfer" onclick="cancelTransfers()">הדגם עצירת העברה</button>
+      </div></div>`;
+  }
+
+  else if(k==='exec'){
+    const empCost = DATA.grossJul + DATA.employerExtras;
+    const avg = Math.round(empCost / DATA.headcountJul);
+    html = agentHeader('סיכום מנהלים · תמונת מצב חודשית') + `<div class="bubble">
+      <div class="done-badge">✓ מוכן להצגה להנהלה</div>
+      <h2>הכנתי תמונת מצב להנהלה — במבט אחד.</h2>
+      <p>כל המספרים כאן נגזרים ישירות ממחזור יולי שסגרנו. אפשר להעביר את זה כמו שהוא ל‑CFO.</p>
+
+      <div class="kpis">
+        <div class="kpi clickable" onclick="drillKpi('gross')"><span class="drill">פירוט ›</span><div class="val count" data-target="${DATA.grossJul}" data-cur="1">₪0</div><div class="cap">שכר ברוטו</div><div class="delta up">▲ ${pct(DATA.grossJul,DATA.grossJun)}% מול יוני</div></div>
+        <div class="kpi ink clickable" onclick="drillKpi('emp')"><span class="drill">פירוט ›</span><div class="val count" data-target="${empCost}" data-cur="1">₪0</div><div class="cap">עלות מעביד כוללת</div><div class="delta flat">כולל הפרשות מעסיק</div></div>
+        <div class="kpi green clickable" onclick="drillKpi('head')"><span class="drill">פירוט ›</span><div class="val count" data-target="${DATA.headcountJul}">0</div><div class="cap">עובדים במצבת</div><div class="delta up">▲ ${DATA.headcountJul-DATA.headcountJun} מול יוני</div></div>
+        <div class="kpi amber clickable" onclick="drillKpi('ot')"><span class="drill">פירוט ›</span><div class="val count" data-target="${DATA.otJul}">0</div><div class="cap">שעות נוספות</div><div class="delta up">▲ ${pct(DATA.otJul,DATA.otJun)}% מול יוני</div></div>
+      </div>
+
+      <div class="exec-grid">
+        <div class="card-chart">
+          <h5>מבנה עלות השכר</h5><div class="sub">התפלגות הברוטו לפי רכיב · לחיצה לפירוט</div>
+          <div class="donut-flex">
+            <div class="donut"><svg viewBox="0 0 150 150" id="donutComp"></svg>
+              <div class="center"><b>${shortIls(DATA.grossJul)}</b><span>סך ברוטו</span></div></div>
+            <div class="dlegend" id="legComp"></div>
+          </div>
+        </div>
+        <div class="card-chart">
+          <h5>עלות לפי מחלקה</h5><div class="sub">חלוקת הברוטו · יולי · לחיצה לפירוט</div>
+          <div class="donut-flex">
+            <div class="donut"><svg viewBox="0 0 150 150" id="donutDept"></svg>
+              <div class="center"><b>${DATA.depts.length}</b><span>מחלקות</span></div></div>
+            <div class="dlegend" id="legDept"></div>
+          </div>
+        </div>
+        <div class="card-chart full clickable" onclick="drillWaterfall()">
+          <h5><span class="drill" style="position:static;opacity:.6">הרחב ›</span> מאיפה הגיעה העלייה?</h5><div class="sub">גשר מיוני ליולי · ${ils(DATA.grossJul-DATA.grossJun)} · ציר ממוקד בשינוי (מ‑₪3.8M)</div>
+          <div class="wf" id="wfMini"></div>
+          <div class="wf-x" id="wfMiniX"></div>
+        </div>
+        <div class="card-chart full">
+          <h5>מפת חריגות נוכחות לפי מחלקה</h5><div class="sub">${DATA.attTotal} חריגות · לחיצה על תא לפירוט</div>
+          <div id="heatmap"></div>
+        </div>
+        <div class="card-chart full">
+          <h5>מגמת עלות השכר</h5><div class="sub">שכר ברוטו · 6 חודשים אחרונים · לחיצה על נקודה</div>
+          <svg class="line-svg" id="lineTrend" viewBox="0 0 600 170"></svg>
+        </div>
+      </div>
+
+      <div class="note">✦ <div>העלות הממוצעת לעובד החודש היא <b>${ils(avg)}</b>. המגמה עולה כבר 3 חודשים ברציפות — עיקר העלייה מגיוס ומבונוסים רבעוניים, לא משחיקת יעילות.</div></div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="next()">המשך לדוחות המפורטים ←</button>
+      </div></div>`;
+  }
+
+  else if(k==='rep'){
+    html = agentHeader('דוחות מפורטים · השוואות · שאל אותי') + `<div class="bubble">
+      <div class="done-badge">✓ המחזור הושלם מקצה לקצה</div>
+      <h2>המחזור סגור. הכנתי לך את מרכז הדוחות.</h2>
+      <p>שישה דוחות מפורטים מוכנים — לחיצה על כל אחד פותחת את הפירוט המלא:</p>
+      <div class="rep-grid">
+        <button class="rep-card" onclick="openReport('summary')"><div class="ri">₪</div><div class="rt"><b>ריכוז שכר לפי מחלקה</b><span>ברוטו · יולי</span></div><span class="rarrow">‹</span></button>
+        <button class="rep-card" onclick="openReport('authorities')"><div class="ri blue">🏛</div><div class="rt"><b>תשלומים לרשויות ולקופות</b><span>מס, ביטוח לאומי, פנסיה</span></div><span class="rarrow">‹</span></button>
+        <button class="rep-card" onclick="openReport('mom')"><div class="ri">↕</div><div class="rt"><b>השוואה חודש‑על‑חודש</b><span>יולי מול יוני</span></div><span class="rarrow">‹</span></button>
+        <button class="rep-card" onclick="drillKpi('ot')"><div class="ri">↑</div><div class="rt"><b>דוח שעות נוספות</b><span>לפי מחלקה</span></div><span class="rarrow">‹</span></button>
+        <button class="rep-card" onclick="openReport('absences')"><div class="ri blue">⚕</div><div class="rt"><b>מחלה ומילואים</b><span>נוכחות → שכר</span></div><span class="rarrow">‹</span></button>
+        <button class="rep-card" onclick="drillKpi('emp')"><div class="ri blue">◫</div><div class="rt"><b>עלות מעביד כוללת</b><span>כולל הפרשות מעסיק</span></div><span class="rarrow">‹</span></button>
+      </div>
+
+      <div class="chart">
+        <h5>שכר ברוטו לפי מחלקה</h5>
+        <div class="sub">יולי 2026 מול יוני 2026</div>
+        <div class="bars" id="bars"></div>
+        <div class="legend"><span><i style="background:linear-gradient(90deg,#F0801A,#2680D6,#17A2C4,#8B5CF6)"></i>יולי · לפי מחלקה</span><span><i style="background:#C6D4E1"></i>יוני</span></div>
+      </div>
+
+      <div class="qa">
+        <div class="qa-head"><div class="mini">ע</div><b>שאל אותי על הדוחות — אענה רק מהנתונים שכאן</b></div>
+        <div class="qa-log" id="qaLog"></div>
+        <div class="chips" id="chips"></div>
+        <div class="qa-input">
+          <input id="qaInput" placeholder="לדוגמה: למה השכר עלה החודש?" onkeydown="if(event.key==='Enter')askInput()">
+          <button onclick="askInput()">שאל</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" onclick="go(0)">↻ הפעל את המחזור מחדש</button>
+      </div></div>`;
+  }
+
+  f.innerHTML = html;
+  if(k==='run'){ requestAnimationFrame(()=>document.querySelectorAll('#focus .gn-fill').forEach(b=>b.style.width=b.dataset.w)); }
+  if(k==='exec'){ initExec(); }
+  if(k==='rep'){ drawBars(); initQA(); }
+}
+
+/* ---------- executive summary: KPIs, donuts, trend ---------- */
+const shortIls = n => '₪' + (n/1e6).toFixed(2) + 'M';
+const reduceMotion = () => window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+function animateCounts(){
+  document.querySelectorAll('.count').forEach(el=>{
+    const target = +el.dataset.target, cur = el.dataset.cur==='1';
+    if(reduceMotion()){ el.textContent = cur?ils(target):target.toLocaleString('he-IL'); return; }
+    const dur=1100, t0=performance.now();
+    const tick=now=>{
+      const p=Math.min((now-t0)/dur,1), e=1-Math.pow(1-p,3), v=Math.round(target*e);
+      el.textContent = cur?ils(v):v.toLocaleString('he-IL');
+      if(p<1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  });
+}
+
+const DONUTS = {};
+function drawDonut(svgId, legId, segs, title){
+  const total = segs.reduce((s,x)=>s+x.v,0);
+  DONUTS[svgId] = {segs, total, title};
+  const R=64, C=2*Math.PI*R, cx=75, cy=75;
+  const svg = document.getElementById(svgId);
+  let cum=0;
+  svg.innerHTML = segs.map((s,i)=>{
+    const off = -(cum/total)*C; cum+=s.v;
+    return `<circle class="seg" data-i="${i}" cx="${cx}" cy="${cy}" r="${R}" stroke="${s.c}" stroke-dashoffset="${off}"></circle>`;
+  }).join('');
+  document.getElementById(legId).innerHTML = segs.map((s,i)=>`
+    <div class="li clickable" data-i="${i}"><i style="background:${s.c}"></i><span>${s.name}</span>
+      <b>${((s.v/total)*100).toFixed(0)}%</b></div>`).join('');
+  // click → drill-down (same handler for arc and legend)
+  const open = i => donutSlice(svgId, i);
+  svg.querySelectorAll('.seg').forEach(el=>el.addEventListener('click',()=>open(+el.dataset.i)));
+  document.getElementById(legId).querySelectorAll('.li').forEach(el=>el.addEventListener('click',()=>open(+el.dataset.i)));
+  // animate reveal
+  const circles = svg.querySelectorAll('.seg');
+  segs.forEach((s,i)=>{
+    const len=(s.v/total)*C;
+    const set=()=>circles[i].style.strokeDasharray = `${len} ${C-len}`;
+    if(reduceMotion()) set(); else setTimeout(()=>requestAnimationFrame(set), 120*i);
+  });
+}
+
+function drawLine(){
+  const svg = document.getElementById('lineTrend');
+  const d = DATA.trend, W=600, H=170, padX=34, padTop=22, padBot=30;
+  const xs = d.map((_,i)=> padX + i*((W-padX*2)/(d.length-1)));
+  const min = Math.min(...d.map(p=>p.v))*0.985, max = Math.max(...d.map(p=>p.v))*1.01;
+  const y = v => padTop + (1-(v-min)/(max-min))*(H-padTop-padBot);
+  const ys = d.map(p=>y(p.v));
+  const line = xs.map((x,i)=>`${i?'L':'M'}${x.toFixed(1)} ${ys[i].toFixed(1)}`).join(' ');
+  const area = `${line} L${xs[xs.length-1].toFixed(1)} ${H-padBot} L${xs[0].toFixed(1)} ${H-padBot} Z`;
+  const grid = [0.5,1].map(g=>{const gy=padTop+g*(H-padTop-padBot);return `<line class="grid" x1="${padX}" y1="${gy}" x2="${W-padX}" y2="${gy}"/>`}).join('');
+  const pts = d.map((p,i)=>`<circle class="pt ${i===d.length-1?'last':''}" data-i="${i}" cx="${xs[i].toFixed(1)}" cy="${ys[i].toFixed(1)}" r="5"/>`).join('');
+  const xl = d.map((p,i)=>`<text class="xlbl" x="${xs[i].toFixed(1)}" y="${H-8}" text-anchor="middle">${p.m}</text>`).join('');
+  const lastLbl = `<text class="vlbl" x="${xs[xs.length-1].toFixed(1)}" y="${(ys[ys.length-1]-12).toFixed(1)}" text-anchor="middle">${shortIls(d[d.length-1].v)}</text>`;
+  svg.innerHTML = `<defs><linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#EE7A1A" stop-opacity="0.22"/><stop offset="1" stop-color="#EE7A1A" stop-opacity="0"/>
+    </linearGradient></defs>
+    ${grid}<path class="area" d="${area}"/><path class="trend" d="${line}"/>${pts}${xl}${lastLbl}`;
+  const trend = svg.querySelector('.trend'), area_=svg.querySelector('.area');
+  const dots = svg.querySelectorAll('.pt'), vl=svg.querySelector('.vlbl');
+  dots.forEach(el=>{ el.style.cursor='pointer'; el.setAttribute('r','7');
+    el.addEventListener('click',()=>trendPoint(+el.dataset.i)); });
+  if(reduceMotion()){
+    trend.style.strokeDashoffset=0; area_.style.opacity=1;
+    dots.forEach(dt=>dt.style.opacity=1); vl.style.opacity=1; return;
+  }
+  requestAnimationFrame(()=>{ trend.style.strokeDashoffset=0; area_.style.opacity=1; });
+  dots.forEach((dt,i)=>setTimeout(()=>dt.style.opacity=1, 200+i*160));
+  setTimeout(()=>vl.style.opacity=1, 200+dots.length*160);
+}
+
+function initExec(){
+  animateCounts();
+  drawDonut('donutComp','legComp', DATA.components, 'מבנה עלות השכר');
+  drawDonut('donutDept','legDept', DATA.depts.map((d,i)=>({name:d.name, v:d.jul, c:CHART[i%CHART.length]})), 'עלות לפי מחלקה');
+  drawWaterfall('wfMini','wfMiniX');
+  drawHeatmap();
+  drawLine();
+}
+
+/* ---------- modal ---------- */
+function openModal(icon, title, bodyHtml){
+  document.getElementById('modalIcon').textContent = icon;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  document.getElementById('modalBg').classList.add('open');
+  // animate any bars inside
+  requestAnimationFrame(()=>document.querySelectorAll('#modalBody .mfill').forEach(b=>b.style.width=b.dataset.w));
+}
+function closeModal(){ document.getElementById('modalBg').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeModal(); });
+
+/* attendance fallback: no response by deadline -> auto unapproved absence, so the cycle can close */
+function escalateYossi(){
+  const step = document.getElementById('yStep3');
+  if(!step || step.classList.contains('fired')) return;
+  step.classList.remove('future'); step.classList.add('fired');
+  document.getElementById('yDot').textContent = '!';
+  document.getElementById('yStep3Body').innerHTML =
+    '<span class="day">25/07 · מועד הסגירה חלף</span>אין תגובה מיוסי ולא מהמנהל. הכנסתי אוטומטית <b>היעדרות לא מאושרת (ללא תשלום)</b> ל‑15–17/07 וסגרתי את הנוכחות שלו — כך המחזור מתקדם בזמן.';
+  // update Yossi's anomaly row to reflect the auto decision
+  document.getElementById('tagYossi').textContent = 'לא מאושרת · אוטו׳';
+  document.getElementById('icYossi').textContent = '⛔';
+  document.getElementById('pYossi').textContent = '15–17/07 · היעדרות ללא תשלום (הוכנס אוטומטית)';
+  // swap the note to a reversibility reassurance
+  const note = document.getElementById('attNote');
+  note.className = 'note info';
+  note.innerHTML = '↩ <div><b>הפיך לחלוטין:</b> סימנתי את יוסי ואת המנהל, ורשמתי ב‑audit trail. אם הדיווח יגיע אחרי הסגירה — אבצע תיקון רטרואקטיבי בתלוש הבא. המחזור לא נעצר, ואף עובד לא "נופל בין הכיסאות".</div>';
+  // disable the trigger
+  const btn = document.getElementById('btnEscalate');
+  btn.textContent = '✓ ההיעדרות הוכנסה אוטומטית'; btn.disabled = true;
+  btn.style.opacity = '.55'; btn.style.cursor = 'default';
+}
+
+// build a list of value rows with proportional bars
+function rowsHtml(items, fmt, color){
+  const max = Math.max(...items.map(i=>i.v));
+  const tot = items.reduce((s,i)=>s+i.v,0);
+  const body = items.map(i=>`<div class="mrow"><span class="mname">${i.name}</span>
+    <span class="mtrack"><span class="mfill" style="background:${color||'var(--orange)'}" data-w="${(i.v/max*100).toFixed(1)}%"></span></span>
+    <span class="mval">${fmt(i.v)}</span></div>`).join('');
+  return {body, tot};
+}
+
+/* payroll run preview (real modal instead of alert) */
+function previewPayroll(){
+  const {body,tot} = rowsHtml(DATA.payrollPreview, ils, 'var(--sblue)');
+  const net = DATA.grossJul - tot;
+  openModal('₪','תצוגה מקדימה · הרצת שכר יולי',
+    `<div class="mrow"><span class="mname">סך ברוטו</span><span class="mtrack"><span class="mfill" style="background:#C6D4E1" data-w="100%"></span></span><span class="mval">${ils(DATA.grossJul)}</span></div>
+     <h3>ניכויי חובה מהעובד</h3>${body}
+     <div class="mtot"><span>נטו כולל להעברה</span><span>${ils(net)}</span></div>
+     <div class="mnote">תצוגה לפני הרצה — עדיין אפשר לחזור ולתקן. אחרי ההרצה יופקו ${DATA.payslipsSent} תלושים לכל העובדים, בתוספת ${DATA.freelancers} פרילנסר שמטופל בנפרד מול חשבונית.</div>`);
+}
+
+/* human guardrail: stop the irreversible bank transfer within the cancel window */
+function cancelTransfers(){
+  const tag = document.getElementById('tagTransfer'); if(tag){ tag.textContent='העברות נעצרו'; tag.className='tag block'; }
+  const ic = document.getElementById('icTransfer'); if(ic){ ic.textContent='⛔'; ic.className='ic red'; }
+  const p = document.getElementById('pTransfer'); if(p){ p.textContent='ההעברה עוכבה לבקשתך — הכספים לא יצאו עד שתשחררי'; }
+  const btn = document.getElementById('btnCancelTransfer'); if(btn){ btn.textContent='✓ הודגמה עצירת העברה'; btn.disabled=true; btn.style.opacity='.55'; btn.style.cursor='default'; }
+}
+
+/* separation-of-duties: send the Amit-initiated correction to a second approver (inline) */
+function sendForApproval(){
+  const tag = document.getElementById('tagCorrection');
+  if(tag){ tag.textContent = 'נשלח · ממתין לחשב נוסף'; }
+  const btn = document.getElementById('btnSendApproval');
+  if(btn){ btn.textContent = '✓ נשלח לאישור חשב נוסף'; btn.disabled = true; btn.style.opacity = '.55'; btn.style.cursor = 'default'; }
+}
+
+/* ---------- KPI drill-downs (all derived from DATA) ---------- */
+function drillKpi(which){
+  if(which==='gross'){
+    const {body,tot} = rowsHtml(DATA.components, ils);
+    openModal('₪','מבנה השכר ברוטו',
+      `${body}<div class="mtot"><span>סך ברוטו</span><span>${ils(tot)}</span></div>
+       <div class="mnote">זהו הבסיס לפני הפרשות מעסיק. העלייה מול יוני הייתה ${ils(DATA.grossJul-DATA.grossJun)} (${pct(DATA.grossJul,DATA.grossJun)}%).</div>
+       <div class="mlink"><button class="btn btn-primary" style="width:100%" onclick="drillWaterfall()">ראה מאיפה הגיעה העלייה ←</button></div>`);
+  }
+  else if(which==='emp'){
+    const {body,tot} = rowsHtml(DATA.employerBreakdown, ils, 'var(--sblue)');
+    const empCost = DATA.grossJul + DATA.employerExtras;
+    openModal('₪','עלות מעביד כוללת',
+      `<div class="mrow"><span class="mname">שכר ברוטו</span><span class="mtrack"><span class="mfill" style="background:#C6D4E1" data-w="100%"></span></span><span class="mval">${ils(DATA.grossJul)}</span></div>
+       <h3>הפרשות מעסיק</h3>${body}
+       <div class="mtot"><span>עלות מעביד כוללת</span><span>${ils(empCost)}</span></div>
+       <div class="mnote">ההפרשות מהוות ${((DATA.employerExtras/DATA.grossJul)*100).toFixed(1)}% מעבר לברוטו.</div>`);
+  }
+  else if(which==='head'){
+    const {body} = rowsHtml(DATA.headcountBreakdown, n=>n, 'var(--sok)');
+    openModal('◍','הרכב המצבת',
+      `${body}<div class="mtot"><span>מצבת פעילה</span><span>${DATA.headcountJul}</span></div>
+       <div class="mnote">בנוסף, ${DATA.leaving} עובד עוזב נמצא בגמר חשבון ואינו נכלל במצבת הפעילה. הגידול נטו מול יוני: ${DATA.headcountJul-DATA.headcountJun} עובדים.</div>`);
+  }
+  else if(which==='ot'){
+    const {body,tot} = rowsHtml(DATA.otByDept, n=>n+' ש׳', 'var(--warn)');
+    openModal('◷','שעות נוספות לפי מחלקה',
+      `${body}<div class="mtot"><span>סך שעות נוספות</span><span>${tot} ש׳</span></div>
+       <div class="mnote">עלייה של ${DATA.otJul-DATA.otJun} שעות מול יוני (${pct(DATA.otJul,DATA.otJun)}%). מחלקת תפעול מובילה בעומס.</div>`);
+  }
+}
+
+/* ---------- donut slice & trend point drill-downs ---------- */
+function donutSlice(svgId, i){
+  const {segs,total,title} = DONUTS[svgId];
+  const s = segs[i];
+  const cur = svgId==='donutDept' ? d=>ils(d) : ils;
+  const others = segs.filter((_,j)=>j!==i);
+  const oth = others.map(o=>`<div class="mrow"><span class="mname">${o.name}</span>
+      <span class="mtrack"><span class="mfill" style="background:${o.c}" data-w="${(o.v/total*100).toFixed(1)}%"></span></span>
+      <span class="mval">${cur(o.v)}</span></div>`).join('');
+  openModal('◑', s.name,
+    `<div class="mrow"><span class="mname" style="font-weight:700;color:var(--sblue)">${s.name}</span>
+       <span class="mtrack"><span class="mfill" style="background:${s.c}" data-w="${(s.v/total*100).toFixed(1)}%"></span></span>
+       <span class="mval">${cur(s.v)}</span></div>
+     <div class="mnote">מהווה <b>${(s.v/total*100).toFixed(1)}%</b> מתוך ${title} (${cur(total)}).</div>
+     <h3>שאר המרכיבים</h3>${oth}`);
+}
+function trendPoint(i){
+  const d=DATA.trend, p=d[i], prev=i>0?d[i-1]:null;
+  const chg = prev ? `שינוי מ${prev.m}: ${p.v-prev.v>=0?'+':''}${ils(p.v-prev.v)} (${pct(p.v,prev.v)}%)` : 'החודש הראשון בטווח';
+  openModal('◔', `שכר ברוטו · ${p.m}`,
+    `<div class="mrow"><span class="mname">ברוטו ${p.m}</span><span class="mtrack"><span class="mfill" data-w="${(p.v/DATA.trend[DATA.trend.length-1].v*100).toFixed(1)}%"></span></span><span class="mval">${ils(p.v)}</span></div>
+     <div class="mnote">${chg}</div>`);
+}
+
+/* ---------- waterfall (mini card + full modal) ---------- */
+const WF_FLOOR = 3800000; // zoomed baseline so small increments are visible (labeled)
+function wfCols(){
+  const base=DATA.grossJun, top=DATA.grossJul;
+  const shorts=['גיוס','בונוסים','נוספות'];
+  const cols=[{t:'יוני', bot:WF_FLOOR, topv:base, cls:'base', lbl:shortIls(base)}];
+  let cum=base;
+  DATA.driver.forEach((dr,i)=>{ cols.push({t:shorts[i]||dr.t, bot:cum, topv:cum+dr.v, cls:'add', lbl:'+'+ils(dr.v)}); cum+=dr.v; });
+  cols.push({t:'יולי', bot:WF_FLOOR, topv:top, cls:'total', lbl:shortIls(top)});
+  return cols;
+}
+function drawWaterfall(barsId, xId){
+  const cols=wfCols(), max=DATA.grossJul+45000, span=max-WF_FLOOR;
+  document.getElementById(barsId).innerHTML = cols.map(c=>`
+    <div class="col"><div class="wbar ${c.cls}"
+      data-h="${((c.topv-c.bot)/span*100).toFixed(1)}%" data-b="${((c.bot-WF_FLOOR)/span*100).toFixed(1)}%">
+      <span class="wval">${c.lbl}</span></div></div>`).join('');
+  if(xId) document.getElementById(xId).innerHTML = cols.map(c=>`<div class="xl">${c.t}</div>`).join('');
+  const bars=document.querySelectorAll('#'+barsId+' .wbar');
+  bars.forEach((b,i)=>{
+    const set=()=>{ b.style.height=b.dataset.h; b.style.bottom=b.dataset.b; };
+    if(reduceMotion()) set(); else setTimeout(()=>requestAnimationFrame(set), 90*i);
+  });
+}
+/* ---------- detailed reports (all derived from DATA) ---------- */
+function openReport(id){
+  if(id==='summary'){
+    const rows = DATA.depts.map(d=>`<tr><td>${d.name}</td><td class="v">${ils(d.jul)}</td></tr>`).join('');
+    openModal('₪','ריכוז שכר לפי מחלקה',
+      `<table class="mtbl"><tr><th>מחלקה</th><th style="text-align:end">ברוטו יולי</th></tr>${rows}
+       <tr class="tot"><td>סך הכל</td><td class="v">${ils(DATA.grossJul)}</td></tr></table>
+       <div class="mnote">${DATA.payslipsSent} תלושים · הנתונים נשלפים ממערכת השכר.</div>`);
+  }
+  else if(id==='authorities'){
+    const emp = DATA.payrollPreview, er = DATA.employerBreakdown;
+    const tot = emp.reduce((s,x)=>s+x.v,0) + er.reduce((s,x)=>s+x.v,0);
+    const t = arr => arr.map(x=>`<tr><td>${x.name}</td><td class="v">${ils(x.v)}</td></tr>`).join('');
+    openModal('🏛','תשלומים לרשויות ולקופות',
+      `<h3>ניכויים מהעובד</h3><table class="mtbl">${t(emp)}</table>
+       <h3>הפרשות מעסיק</h3><table class="mtbl">${t(er)}</table>
+       <div class="mtot"><span>סך העברות לרשויות ולקופות</span><span>${ils(tot)}</span></div>
+       <div class="mnote">מס הכנסה וביטוח לאומי מדווחים בטופס 102. פנסיה ופיצויים מועברים למסלקה הפנסיונית.</div>`);
+  }
+  else if(id==='mom'){
+    const rows = DATA.depts.map(d=>`<tr><td>${d.name}</td><td class="v">${ils(d.jun)}</td><td class="v">${ils(d.jul)}</td><td class="up">+${pct(d.jul,d.jun)}%</td></tr>`).join('');
+    openModal('↕','השוואה חודש‑על‑חודש',
+      `<table class="mtbl"><tr><th>מחלקה</th><th style="text-align:end">יוני</th><th style="text-align:end">יולי</th><th style="text-align:end">שינוי</th></tr>${rows}
+       <tr class="tot"><td>סך הכל</td><td class="v">${ils(DATA.grossJun)}</td><td class="v">${ils(DATA.grossJul)}</td><td class="up">+${pct(DATA.grossJul,DATA.grossJun)}%</td></tr></table>`);
+  }
+  else if(id==='absences'){
+    const s = DATA.absences.sick, r = DATA.absences.reserve;
+    const row = (n,v)=>`<div class="mrow"><span class="mname">${n}</span><span class="mtrack" style="visibility:hidden"></span><span class="mval">${v}</span></div>`;
+    openModal('⚕','מחלה ומילואים',
+      `<h3>מחלה</h3>${row('ימי מחלה',s.days)}${row('עובדים',s.emps)}${row('ממתין לתעודה רפואית',s.pendingCert)}
+       <h3>מילואים</h3>${row('ימי מילואים',r.days)}${row('עובדים',r.emps)}
+       <div class="mnote">${r.claim}. מחלה ומילואים נקלטים ב<b>מערכת הנוכחות</b> ומוזנים אוטומטית ל<b>שכר</b> — כולל חישוב דמי מחלה לפי חוק ותביעת ההחזר מביטוח לאומי על ימי המילואים.</div>`);
+  }
+}
+
+function drillWaterfall(){
+  closeModal();
+  setTimeout(()=>openModal('▲','מאיפה הגיעה העלייה של '+ils(DATA.grossJul-DATA.grossJun),
+    `<div class="wf" id="wfModal" style="height:190px"></div><div class="wf-x" id="wfModalX"></div>
+     <div class="wf-connect">יוני ${ils(DATA.grossJun)} ← יולי ${ils(DATA.grossJul)} · ציר מתחיל ב‑₪3.8M להבלטת השינוי</div>
+     <div class="mnote">כל העלייה מוסברת: אין רכיב חריג. גיוס ובונוסים רבעוניים הם ${((DATA.driver[0].v+DATA.driver[1].v)/(DATA.grossJul-DATA.grossJun)*100).toFixed(0)}% מהגידול.</div>`),
+  60);
+  setTimeout(()=>drawWaterfall('wfModal','wfModalX'), 120);
+}
+
+/* ---------- heatmap ---------- */
+function heatColor(v,max){
+  if(v===0) return {bg:'#EEF3F7', fg:'#B4C2D0'};
+  const t=v/max;
+  const scale=[[252,242,225],[247,213,163],[232,142,110],[198,74,63]]; // amber→red
+  const idx=Math.min(scale.length-1, Math.round(t*(scale.length-1)));
+  const [r,g,b]=scale[idx];
+  return {bg:`rgb(${r},${g},${b})`, fg: idx>=2?'#fff':'#7a4b12'};
+}
+function drawHeatmap(){
+  const types=DATA.anomalyTypes, rows=DATA.heatmap;
+  const max=Math.max(...rows.flatMap(r=>r.row));
+  const el=document.getElementById('heatmap');
+  el.style.display='grid';
+  el.style.gridTemplateColumns=`72px repeat(${types.length},1fr)`;
+  el.style.gap='5px';
+  let html = `<div class="hhead"></div>` + types.map(t=>`<div class="hhead">${t}</div>`).join('');
+  rows.forEach((r,ri)=>{
+    html += `<div class="hdept">${r.dept}</div>`;
+    r.row.forEach((v,ci)=>{
+      const {bg,fg}=heatColor(v,max);
+      const cls = v>0?'hcell data':'hcell';
+      const oc = v>0?`onclick="heatCell(${ri},${ci})"`:'';
+      html += `<div class="${cls}" style="background:${bg};color:${fg}" ${oc} title="${r.dept} · ${types[ci]}: ${v}">${v||''}</div>`;
+    });
+  });
+  el.innerHTML = html;
+  const lg = document.createElement('div');
+  lg.className='hm-legend';
+  lg.innerHTML = `נמוך <span class="sw" style="background:#EEF3F7"></span><span class="sw" style="background:#F7D5A3"></span><span class="sw" style="background:#E88E6E"></span><span class="sw" style="background:#C64A3F"></span> גבוה`;
+  el.after(lg);
+}
+function heatCell(ri,ci){
+  const r=DATA.heatmap[ri], t=DATA.anomalyTypes[ci], v=r.row[ci];
+  const deptTot=r.row.reduce((s,x)=>s+x,0);
+  const typeTot=DATA.heatmap.reduce((s,rr)=>s+rr.row[ci],0);
+  openModal('◈', `${r.dept} · ${t}`,
+    `<div class="mnote" style="font-size:15px;color:var(--sblue)"><b>${v}</b> חריגות מסוג "${t}" במחלקת ${r.dept}.</div>
+     <h3>הקשר</h3>
+     <div class="mrow"><span class="mname">סה״כ ב${r.dept}</span><span class="mtrack"><span class="mfill" style="background:var(--warn)" data-w="${(deptTot/DATA.attTotal*100).toFixed(0)}%"></span></span><span class="mval">${deptTot} חריגות</span></div>
+     <div class="mrow"><span class="mname">סה״כ "${t}"</span><span class="mtrack"><span class="mfill" style="background:var(--warn)" data-w="${(typeTot/DATA.attTotal*100).toFixed(0)}%"></span></span><span class="mval">${typeTot} חריגות</span></div>
+     <div class="mnote">מתוך ${DATA.attTotal} חריגות במחזור. ${DATA.attAuto} טופלו אוטומטית ו‑${DATA.attReview} עברו לאישור.</div>`);
+}
+
+/* ---------- report chart ---------- */
+function drawBars(){
+  const max = Math.max(...DATA.depts.map(d=>d.jul));
+  document.getElementById('bars').innerHTML = DATA.depts.map((d,i)=>`
+    <div class="barrow">
+      <div class="name">${d.name}</div>
+      <div class="barpair">
+        <div class="bar jul" style="width:0;background:${CHART[i%CHART.length]}" data-w="${(d.jul/max*100).toFixed(1)}%"><span>${ils(d.jul)}</span></div>
+        <div class="bar jun" style="width:0" data-w="${(d.jun/max*100).toFixed(1)}%"><span>${ils(d.jun)}</span></div>
+      </div>
+    </div>`).join('');
+  requestAnimationFrame(()=>document.querySelectorAll('.bar').forEach(b=>b.style.width=b.dataset.w));
+}
+
+/* ---------- report Q&A — answers derived ONLY from DATA, never invented ---------- */
+function answerFor(qRaw){
+  const q = qRaw.trim();
+  const growthDept = [...DATA.depts].sort((a,b)=>(b.jul-b.jun)-(a.jul-a.jun))[0];
+  const rules = [
+    {m:['למה','עלה','עלייה','גדל','עולה'], a:()=>{
+      const diff = DATA.grossJul-DATA.grossJun;
+      const parts = DATA.driver.map(d=>`${d.t} (${ils(d.v)})`).join('، ');
+      return `השכר עלה ב‑${pct(DATA.grossJul,DATA.grossJun)}% (${ils(diff)}) מול יוני. הפירוט: ${parts}. אין רכיב בלתי‑מוסבר.`;
+    }},
+    {m:['שעות נוספות','נוספות','אוברטיים'], a:()=>`שעות נוספות עלו מ‑${DATA.otJun} ביוני ל‑${DATA.otJul} ביולי — תוספת של ${DATA.otJul-DATA.otJun} שעות (${pct(DATA.otJul,DATA.otJun)}%).`},
+    {m:['מחלקה','גידול','הכי','גדול'], a:()=>`הגידול הגדול ביותר במחלקת ${growthDept.name}: ${ils(growthDept.jul-growthDept.jun)} (${pct(growthDept.jul,growthDept.jun)}%) — מ‑${ils(growthDept.jun)} ל‑${ils(growthDept.jul)}.`},
+    {m:['ברוטו','סך','כמה שילמנו','עלות','שכר החודש'], a:()=>`סך השכר ברוטו ביולי: ${ils(DATA.grossJul)} עבור ${DATA.payslipsSent} עובדים (מול ${ils(DATA.grossJun)} ביוני).`},
+    {m:['עובדים','מצבת','כמה עובדים','headcount'], a:()=>`במצבת יולי ${DATA.headcountJul} עובדים — ${DATA.newHires} חדשים ו‑${DATA.leaving} עוזב מול יוני (${DATA.headcountJun}).`},
+    {m:['חריג','חריגות','נוכחות'], a:()=>`בנוכחות היו ${DATA.attTotal} חריגות: ${DATA.attAuto} טופלו אוטומטית ו‑${DATA.attReview} עברו לאישורך.`},
+    {m:['פרילנסר','חשבונית'], a:()=>`${DATA.freelancers} פרילנסר (ספק 001) — שולם מול חשבונית, ללא תלוש, ולא נכלל ב‑${ils(DATA.grossJul)} של השכר.`},
+  ];
+  for(const r of rules){ if(r.m.some(w=>q.includes(w))) return r.a(); }
+  return 'אין לי את הנתון הזה בדוח הנוכחי. אני עונה רק על מה שמופיע בדוח יולי — שכר ברוטו, מחלקות, שעות נוספות, מצבת וחריגות נוכחות.';
+}
+const CHIPS = ['למה השכר עלה החודש?','כמה עלו השעות הנוספות?','איזו מחלקה גדלה הכי הרבה?'];
+function initQA(){
+  document.getElementById('chips').innerHTML = CHIPS.map(c=>`<button class="chip" onclick="ask('${c}')">${c}</button>`).join('');
+}
+function ask(q){
+  const log = document.getElementById('qaLog');
+  log.innerHTML += `<div class="q">${q}</div>`;
+  const reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  setTimeout(()=>{ log.innerHTML += `<div class="a">${answerFor(q)}</div>`; log.scrollTop=log.scrollHeight; }, reduce?30:450);
+}
+function askInput(){
+  const el = document.getElementById('qaInput');
+  const v = el.value.trim(); if(!v) return;
+  el.value=''; ask(v);
+}
+
+/* ---------- global agent chat (spans attendance + payroll systems) ---------- */
+function agentAnswer(qRaw){
+  const q = qRaw.trim(), g = DATA;
+  const growth = [...g.depts].sort((a,b)=>(b.jul-b.jun)-(a.jul-a.jun))[0];
+  const ded = g.payrollPreview.reduce((s,d)=>s+d.v,0), net = g.grossJul - ded;
+  const R = [
+    {k:['איך אתה מחבר','איך אתה','מאוחד','שתי המערכות','שכבה','שתי מערכות','מחבר'], src:'both',
+      a:()=>'אני שכבה אחת מעל שתי מערכות — נוכחות ושכר. שאלות על חריגות, מחלה ומילואים אני שולף ממערכת הנוכחות; שאלות על עלות, ברוטו ונטו — ממערכת השכר. מבחינתך זו מערכת אחת, ואני יודע מאיפה לקחת ולאן לעדכן.'},
+    {k:['מחלה','חולה','תעודת'], src:'both',
+      a:()=>`החודש ${g.absences.sick.days} ימי מחלה ל‑${g.absences.sick.emps} עובדים (נלקח מהנוכחות). ${g.absences.sick.pendingCert} יום עדיין ממתין לתעודה רפואית — עד שתגיע הוא מסומן ולא משולם. את חישוב דמי המחלה לפי חוק (יום 1: 0%, ימים 2–3: 50%, יום 4+: 100%) אני מזין אוטומטית לשכר.`},
+    {k:['מילואים','מילוא','צבא'], src:'both',
+      a:()=>`${g.absences.reserve.emps} עובדים במילואים, ${g.absences.reserve.days} ימים סה"כ (נלקח מהנוכחות). שילמתי להם שכר רגיל דרך השכר, ובמקביל ${g.absences.reserve.claim} — כך המעסיק מקבל החזר. זה בדיוק החיבור בין שתי המערכות.`},
+    {k:['לא דיווח','מי לא','חסר דיווח','דיווחו'], src:'att',
+      a:()=>'עובד 002 — 3 ימי היעדרות לא מדווחים (15–17/07). שלחתי תזכורת, הסלמתי למנהל, ואם לא תהיה תגובה עד סגירת הנוכחות אכניס היעדרות לא מאושרת כדי שהמחזור יתקדם.'},
+    {k:['101','טופס'], src:'att',
+      a:()=>'עובד 005 ללא טופס 101 בתוקף לשנת 2026. ברירת המחדל היא ניכוי מס מקסימלי, ושלחתי לו בקשה למילוי דיגיטלי.'},
+    {k:['נטו'], src:'pay',
+      a:()=>`הנטו הכולל להעברה: ${ils(net)} — מתוך ברוטו ${ils(g.grossJul)}, אחרי ניכויי חובה של ${ils(ded)} (${(ded/g.grossJul*100).toFixed(0)}%).`},
+    {k:['שעות נוספות','נוספות','אוברטיים'], src:'both',
+      a:()=>`${g.otJul} שעות נוספות החודש (נלקח מהנוכחות), עלייה של ${g.otJul-g.otJun} שעות מול יוני. בשכר הן מתורגמות לכ‑₪43,000 מעבר ליוני.`},
+    {k:['חריג','חריגות'], src:'att',
+      a:()=>`מצאתי ${g.attTotal} חריגות בנוכחות: ${g.attAuto} טופלו אוטומטית ו‑${g.attReview} עברו לאישור — החתמות, שעות נוספות, מסמכים חסרים ומעברי אחוז משרה.`},
+    {k:['למה','עלה','עלייה','גדל','עולה'], src:'pay',
+      a:()=>{const diff=g.grossJul-g.grossJun;const parts=g.driver.map(d=>`${d.t} (${ils(d.v)})`).join('، ');return `השכר עלה ב‑${pct(g.grossJul,g.grossJun)}% (${ils(diff)}) מול יוני. הפירוט: ${parts}. אין רכיב בלתי‑מוסבר.`;}},
+    {k:['מחלקה','גידול'], src:'pay',
+      a:()=>`הגידול הגדול ביותר במחלקת ${growth.name}: ${ils(growth.jul-growth.jun)} (${pct(growth.jul,growth.jun)}%) — מ‑${ils(growth.jun)} ל‑${ils(growth.jul)}.`},
+    {k:['מצבת','כמה עובדים','headcount'], src:'att',
+      a:()=>`במצבת ${g.headcountJul} עובדים — ${g.newHires} חדשים ו‑${g.leaving} עוזב מול יוני (${g.headcountJun}).`},
+    {k:['ברוטו','סך','עלות','שילמנו','שכר'], src:'pay',
+      a:()=>`סך ברוטו יולי: ${ils(g.grossJul)} ל‑${g.payslipsSent} עובדים. עלות מעביד כוללת: ${ils(g.grossJul+g.employerExtras)}.`},
+    {k:['פרילנסר','חשבונית'], src:'pay',
+      a:()=>`${g.freelancers} פרילנסר (ספק 001) — שולם מול חשבונית, ללא תלוש, ולא נכלל ב‑${ils(g.grossJul)} של השכר.`},
+  ];
+  for(const r of R){ if(r.k.some(w=>q.includes(w))) return {text:r.a(), src:r.src}; }
+  return {text:'אין לי את הנתון הזה. אני עונה מתוך מחזור יולי — נוכחות (חריגות, מחלה, מילואים, מי לא דיווח) ושכר (ברוטו, נטו, עלות, מחלקות).', src:null};
+}
+const CHAT_CHIPS = ['מה מצב חריגות הנוכחות?','כמה ימי מחלה החודש?','מה עם המילואים?','מה הנטו להעברה?','איך אתה מחבר בין המערכות?'];
+let chatStarted = false;
+function openChat(){
+  document.getElementById('chatScrim').classList.add('open');
+  document.getElementById('chatPanel').classList.add('open');
+  if(!chatStarted){
+    chatStarted = true;
+    document.getElementById('chatChips').innerHTML = CHAT_CHIPS.map(c=>`<button class="chip" onclick="chatAsk('${c}')">${c}</button>`).join('');
+    chatBot('היי, אני עמית. אני מחבר בין מערכת הנוכחות למערכת השכר — שאל אותי כל דבר על מחזור יולי, ותראה לצד כל תשובה מאיזו מערכת שלפתי אותה.', 'both');
+  }
+  setTimeout(()=>{ const i=document.getElementById('chatInput'); if(i) i.focus(); }, 300);
+}
+function closeChat(){
+  document.getElementById('chatScrim').classList.remove('open');
+  document.getElementById('chatPanel').classList.remove('open');
+}
+function srcTag(src){
+  if(src==='att')  return '<span class="csrc att">◷ מקור: נוכחות</span>';
+  if(src==='pay')  return '<span class="csrc pay">₪ מקור: שכר</span>';
+  if(src==='both') return '<span class="csrc both">⇄ נוכחות + שכר</span>';
+  return '';
+}
+function chatBot(text, src){
+  const log = document.getElementById('chatLog');
+  log.innerHTML += `<div class="cmsg a">${text}${src?('<br>'+srcTag(src)):''}</div>`;
+  log.scrollTop = log.scrollHeight;
+}
+function chatAsk(q){
+  const log = document.getElementById('chatLog');
+  log.innerHTML += `<div class="cmsg q">${q}</div>`; log.scrollTop = log.scrollHeight;
+  const {text,src} = agentAnswer(q);
+  setTimeout(()=>chatBot(text,src), reduceMotion()?30:430);
+}
+function chatSend(){
+  const el = document.getElementById('chatInput'); const v = el.value.trim(); if(!v) return;
+  el.value=''; chatAsk(v);
+}
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeChat(); });
+
+/* ---------- boot ---------- */
+renderSpine();
+renderStage();
+</script>
+</body>
+</html>
