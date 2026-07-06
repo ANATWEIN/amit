@@ -2152,9 +2152,9 @@ function clkSeed(){
     <div class="er"><span class="d w"></span>6 חריגות בפיתוח · 4 במכירות · 3 בתפעול</div>
     <div class="er"><span class="d w"></span>22 אישורי שעות/היעדרות ממתינים למנהלים</div>
   </div>`);
-  clkNode(`<button class="abox-cta" onclick="clkStartCycle()">בוא נתחיל את המחזור ←</button>`);
+  clkBot('אפשר לשאול אותי על החריגות, האישורים או מועד ההרצה — וכשתהיי מוכנה, נתחיל.');
   document.getElementById('aboxChips').innerHTML=
-    ['בוא נתחיל','כמה חריגות?','סיכום מנהלים','דוחות','מתי מועד ההרצה?']
+    ['כמה חריגות?','כמה אישורים ממתינים?','מתי מועד ההרצה?','מה בסטטוס המחזור?']
     .map(q=>`<button onclick="clkAsk('${q}')">${q}</button>`).join('');
 }
 function clkOpen(){document.getElementById('abox').classList.remove('min');document.getElementById('cfab').classList.add('hide');clkSeed();setTimeout(()=>{var i=document.getElementById('aboxIn');if(i)i.focus();},250);}
@@ -2170,6 +2170,11 @@ function clkCollapse(){
   document.querySelector('.app').classList.remove('expanded');
   var m=document.querySelector('.clk-min');if(m)m.style.display='none';
   clkOpen();
+}
+let clkCtaShown=false;
+function clkOfferStart(){
+  if(clkCtaShown) return; clkCtaShown=true;
+  setTimeout(()=>clkNode('<button class="abox-cta" onclick="clkStartCycle(0)">בוא נתחיל את המחזור ←</button>'),450);
 }
 function clkAsk(q){
   q=(q||'').trim();if(!q)return;
@@ -2198,7 +2203,7 @@ function clkAsk(q){
   else if(/אישור|ממתין/.test(low)) a='ממתינים <b>22 אישורי שעות/היעדרות</b> למנהלים. בשלב האישורים אפשר לשלוח תזכורת מרוכזת בלחיצה.';
   else if(/הרצה|מתי/.test(low)) a='מועד ההרצה המתוכנן הוא <b>היום</b>, אחרי סגירת החריגות ו-22 האישורים הממתינים. אלווה אותך עד לשם.';
   else if(/סטטוס|מצב/.test(low)) a='המחזור <b>טרם התחיל</b>: 107 עובדים, 16 חריגות, 22 אישורים ממתינים, 0 מוכנים להרצה. מוכנה שנתחיל?';
-  if(a){ setTimeout(()=>clkBot(a),300); return; }
+  if(a){ setTimeout(()=>{ clkBot(a); clkOfferStart(); },300); return; }
   // ---- honest fallback: open the cycle where the real answer lives, not a dead generic loop ----
   setTimeout(()=>clkBot('את הנתון המדויק לזה אני מציג בתוך המחזור. בוא נפתח אותו ואראה לך אותו במקום.'),250);
   setTimeout(()=>clkNode('<button class="abox-cta" onclick="clkStartCycle(0)">פתח את המחזור ←</button>'),480);
